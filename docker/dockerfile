@@ -1,0 +1,4 @@
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+COPY build/libs/hw-0.0.1-SNAPSHOT.jar /tmp/hw_ebay.jar
+ENTRYPOINT ["java","-jar","/tmp/hw_ebay.jar"]
