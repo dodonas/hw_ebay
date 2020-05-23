@@ -9,6 +9,10 @@ import io.cucumber.java8.En;
 import io.restassured.RestAssured;
 import io.restassured.response.ResponseBody;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
 
 import static java.util.Map.entry;
@@ -92,6 +96,8 @@ public class OmdbApiTestSteps extends AbstractSteps implements En {
         Then("^the result title contains \"([^\"]*)\"$", (String expectedTitle) -> {
             scenario.write(String.format("Expected title %s, actual title %s", expectedTitle,
                     omdbResponse.as(OmdbResponse.class).getTitle()));
+            assertThat(isPosterValid(new URL(omdbResponse.as(OmdbResponse.class).getPoster()))).isTrue();
+            scenario.write("Poster is valid");
             assertThat(omdbResponse.as(OmdbResponse.class).getTitle()).isEqualTo(expectedTitle);
         });
 
@@ -114,12 +120,27 @@ public class OmdbApiTestSteps extends AbstractSteps implements En {
             scenario.write(String.format("Expected plot length %s, actual plot length (%s) - %s", expectedPlotLength,
                     omdbResponse.as(OmdbResponse.class).getPlot().length(),
                     omdbResponse.as(OmdbResponse.class).getPlot()));
+            assertThat(isPosterValid(new URL(omdbResponse.as(OmdbResponse.class).getPoster()))).isTrue();
+            scenario.write("Poster is valid");
             assertThat(omdbResponse.as(OmdbResponse.class).getPlot().length()).isEqualTo(expectedPlotLength);
         });
 
 
     }
 
+    private static Boolean isPosterValid(URL imgUrl) {
+        try {
+            BufferedImage image = ImageIO.read(imgUrl);
+            if (image != null) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            return false;
+        }
+
+    }
 
     private Map.Entry<String, String> getApiKey() {
         return entry("apikey", apiKey);
